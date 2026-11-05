@@ -1,5 +1,6 @@
 package ru.gr0550x.lec7.ui;
 
+import ru.gr0550x.lec7.application.TaskChangeListener;
 import ru.gr0550x.lec7.application.TaskService;
 import ru.gr0550x.lec7.application.TaskStatistics;
 import ru.gr0550x.lec7.domain.Task;
@@ -7,7 +8,7 @@ import ru.gr0550x.lec7.domain.Task;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskListPresenter {
+public class TaskListPresenter implements TaskChangeListener {
     private final TaskView view;
     private final TaskService service;
 
@@ -17,6 +18,12 @@ public class TaskListPresenter {
     }
 
     public void start() {
+        service.addChangeListener(this);
+        refresh();
+    }
+
+    @Override
+    public void tasksChanged(){
         refresh();
     }
 
@@ -27,12 +34,10 @@ public class TaskListPresenter {
             return;
         }
         try {
-            task.complete();
+            service.complete(task);
         } catch (IllegalStateException ex) {
             view.showError(ex.getMessage());
-            return;
         }
-        refresh();
     }
 
     public void refresh() {

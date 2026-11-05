@@ -12,7 +12,8 @@ public final class TaskFilters {
                 new TaskFilter("Все", task -> true),
                 new TaskFilter("Активные", task -> !task.isDone()),
                 new TaskFilter("Просроченные", task -> task.isOverdue()),
-                new TaskFilter("Высокий приоритет", task -> task.getPriority() == Priority.HIGH)
+                new TaskFilter("Высокий приоритет", task -> task.getPriority() == Priority.HIGH),
+                new TaskFilter("Низкий приоритет", task -> task.getPriority() == Priority.LOW)
         );
     }
 }

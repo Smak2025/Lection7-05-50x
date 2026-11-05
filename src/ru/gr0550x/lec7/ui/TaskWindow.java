@@ -83,7 +83,7 @@ public class TaskWindow extends JFrame implements TaskView {
         });
 
         saveButton.addActionListener(e -> {
-            if (formPresenter.saveClicked()) listPresenter.refresh();
+            formPresenter.saveClicked();
         });
         completeButton.addActionListener(e -> listPresenter.completeSelected());
         filterBox.addActionListener(e -> listPresenter.refresh());
