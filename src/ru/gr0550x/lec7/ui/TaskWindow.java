@@ -35,15 +35,14 @@ public class TaskWindow extends JFrame implements TaskView {
     public TaskWindow(
             TaskService service,
             CommandHistory history,
-            TaskReportGenerator shortReport,
-            TaskReportGenerator detailedReport
+            List<TaskReportGenerator> reportGenerators
     ) {
         this.formPresenter = new TaskFormPresenter(
                 this, service, history
         );
 
         this.listPresenter = new TaskListPresenter(
-                this, service, history, shortReport, detailedReport
+                this, service, history, reportGenerators
         );
 
         setTitle("Список задач");
@@ -125,11 +124,11 @@ public class TaskWindow extends JFrame implements TaskView {
 
         // Окно только сообщает презентеру о действии пользователя.
         shortReportButton.addActionListener(
-                e -> listPresenter.showShortReport()
+                e -> listPresenter.showReport(0)
         );
 
         detailedReportButton.addActionListener(
-                e -> listPresenter.showDetailedReport()
+                e -> listPresenter.showReport(1)
         );
     }
 

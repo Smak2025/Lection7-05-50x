@@ -12,21 +12,18 @@ public class TaskListPresenter implements TaskChangeListener {
     private final CommandHistory history;
 
     // Генераторы передаются презентеру при создании.
-    private final TaskReportGenerator shortReport;
-    private final TaskReportGenerator detailedReport;
+    private final List<TaskReportGenerator> reportGenerators;
 
     public TaskListPresenter(
-            TaskView view,
+            TaskWindow view,
             TaskService service,
             CommandHistory history,
-            TaskReportGenerator shortReport,
-            TaskReportGenerator detailedReport
+            List<TaskReportGenerator> reportGenerators
     ) {
         this.view = view;
         this.service = service;
         this.history = history;
-        this.shortReport = shortReport;
-        this.detailedReport = detailedReport;
+        this.reportGenerators = reportGenerators;
     }
 
     public void start() {
@@ -76,14 +73,12 @@ public class TaskListPresenter implements TaskChangeListener {
         return "Всего: " + s.total() + ", выполнено: " + s.done() + ", просрочено: " + s.overdue();
     }
 
-    // Пользователь запросил краткий отчёт.
-    public void showShortReport() {
-        showReport(shortReport);
-    }
-
-    // Пользователь запросил подробный отчёт.
-    public void showDetailedReport() {
-        showReport(detailedReport);
+    public void showReport(int generatorNum){
+        if (generatorNum < 0 || generatorNum >= reportGenerators.size()){
+            view.showError("Выбран неподдерживаемый тип отчета");
+            return;
+        }
+        showReport(reportGenerators.get(generatorNum));
     }
 
     // Общий сценарий получения и показа отчёта.
