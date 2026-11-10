@@ -34,6 +34,10 @@ public class Task {
         done = true;
     }
 
+    public void reopen(){
+        done = false;
+    }
+
     public boolean isOverdue() {
         return !done && deadline.isBefore(LocalDate.now());
     }

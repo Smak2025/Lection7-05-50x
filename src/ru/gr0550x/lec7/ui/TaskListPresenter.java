@@ -1,8 +1,6 @@
 package ru.gr0550x.lec7.ui;
 
-import ru.gr0550x.lec7.application.TaskChangeListener;
-import ru.gr0550x.lec7.application.TaskService;
-import ru.gr0550x.lec7.application.TaskStatistics;
+import ru.gr0550x.lec7.application.*;
 import ru.gr0550x.lec7.domain.Task;
 
 import java.util.ArrayList;
@@ -11,10 +9,16 @@ import java.util.List;
 public class TaskListPresenter implements TaskChangeListener {
     private final TaskView view;
     private final TaskService service;
+    private final CommandHistory history;
 
-    public TaskListPresenter(TaskView view, TaskService service) {
+    public TaskListPresenter(
+            TaskView view,
+            TaskService service,
+            CommandHistory history
+    ) {
         this.view = view;
         this.service = service;
+        this.history = history;
     }
 
     public void start() {
@@ -33,10 +37,20 @@ public class TaskListPresenter implements TaskChangeListener {
             view.showError("Выберите задачу в списке");
             return;
         }
+        if (task.isDone()){
+            view.showError("Задача уже выполнена");
+            return;
+        }
         try {
-            service.complete(task);
+            history.execute(new CompleteTaskCommand(service, task));
         } catch (IllegalStateException ex) {
             view.showError(ex.getMessage());
+        }
+    }
+
+    public void undoLast(){
+        if (!history.undo()){
+            view.showError("Отменять нечего");
         }
     }
 

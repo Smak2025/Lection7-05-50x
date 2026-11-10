@@ -1,5 +1,6 @@
 package ru.gr0550x.lec7.ui;
 
+import ru.gr0550x.lec7.application.CommandHistory;
 import ru.gr0550x.lec7.application.TaskService;
 import ru.gr0550x.lec7.domain.Priority;
 import ru.gr0550x.lec7.domain.Task;
@@ -21,13 +22,17 @@ public class TaskWindow extends JFrame implements TaskView {
             new JComboBox<>(TaskFilters.standard().toArray(new TaskFilter[0]));
     private final JButton saveButton = new JButton("Добавить");
     private final JButton completeButton = new JButton("Выполнить");
+    private final JButton undoButton = new JButton("Отменить");
     private final DefaultListModel<Task> listModel = new DefaultListModel<>();
     private final JList<Task> taskList = new JList<>(listModel);
     private final JLabel statisticsLabel = new JLabel(" ");
 
-    public TaskWindow(TaskService service) {
-        this.formPresenter = new TaskFormPresenter(this, service);
-        this.listPresenter = new TaskListPresenter(this, service);
+    public TaskWindow(
+            TaskService service,
+            CommandHistory history
+    ) {
+        this.formPresenter = new TaskFormPresenter(this, service, history);
+        this.listPresenter = new TaskListPresenter(this, service, history);
 
         setTitle("Список задач");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -51,6 +56,7 @@ public class TaskWindow extends JFrame implements TaskView {
         JPanel buttons = new JPanel(new FlowLayout());
         buttons.add(saveButton);
         buttons.add(completeButton);
+        buttons.add(undoButton);
 
         JPanel top = new JPanel(new BorderLayout(5, 5));
         top.add(form, BorderLayout.CENTER);
@@ -87,6 +93,10 @@ public class TaskWindow extends JFrame implements TaskView {
         });
         completeButton.addActionListener(e -> listPresenter.completeSelected());
         filterBox.addActionListener(e -> listPresenter.refresh());
+
+        undoButton.addActionListener(e -> {
+            listPresenter.undoLast();
+        });
     }
 
     private Color colorFor(Priority priority) {

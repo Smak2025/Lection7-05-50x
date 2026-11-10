@@ -13,5 +13,10 @@ public class InMemoryTaskRepository implements TaskRepository {
     public void save(Task task) { tasks.add(task); }
 
     @Override
+    public void delete(Task task) {
+        tasks.remove(task);
+    }
+
+    @Override
     public List<Task> findAll() { return List.copyOf(tasks); }
 }

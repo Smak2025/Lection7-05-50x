@@ -1,6 +1,9 @@
 package ru.gr0550x.lec7.ui;
 
+import ru.gr0550x.lec7.application.CommandHistory;
+import ru.gr0550x.lec7.application.CreateTaskCommand;
 import ru.gr0550x.lec7.application.TaskService;
+import ru.gr0550x.lec7.domain.Task;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -8,17 +11,25 @@ import java.time.format.DateTimeParseException;
 public class TaskFormPresenter {
     private final TaskView view;
     private final TaskService service;
+    private final CommandHistory history;
 
-    public TaskFormPresenter(TaskView view, TaskService service) {
+    public TaskFormPresenter(
+            TaskView view,
+            TaskService service,
+            CommandHistory history
+    ) {
         this.view = view;
         this.service = service;
+        this.history = history;
     }
 
     // Возвращает true, если задача сохранена
     public boolean saveClicked() {
         try {
             LocalDate deadline = parseDeadline(view.getDeadlineText());
-            service.createTask(view.getTaskTitle(), deadline, view.getPriority(), view.isArchived());
+            Task task = new Task(view.getTaskTitle(), deadline, view.getPriority());
+            if (view.isArchived()) task.archive();
+            history.execute(new CreateTaskCommand(service, task));
             view.clearForm();
             return true;
         } catch (IllegalArgumentException ex) {

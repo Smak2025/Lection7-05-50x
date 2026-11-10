@@ -20,21 +20,29 @@ public class TaskService {
         listeners.add(listener);
     }
 
-    private void notifyListeners(){
-        for (var listener:  listeners) {
+    private void notifyListeners() {
+        for (var listener : listeners) {
             listener.tasksChanged();
         }
     }
 
-    public void createTask(String title, LocalDate deadline, Priority priority, boolean archived) {
-        Task task = new Task(title, deadline, priority);
-        if (archived) task.archive();
+    public void save(Task task){
         repository.save(task);
         notifyListeners();
     }
 
     public void complete(Task task){
         task.complete();
+        notifyListeners();
+    }
+
+    public void delete(Task task){
+        repository.delete(task);
+        notifyListeners();
+    }
+
+    public void reopen(Task task){
+        task.reopen();
         notifyListeners();
     }
 
