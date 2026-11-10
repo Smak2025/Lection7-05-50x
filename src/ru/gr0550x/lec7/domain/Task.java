@@ -12,6 +12,10 @@ public class Task {
     // Необязательное описание задачи.
     private final String description;
 
+    public Task(String title, LocalDate deadline, Priority priority){
+        this(title, deadline, priority, "");
+    }
+
     // Общий конструктор, содержащий проверки обязательных параметров.
     private Task(String title, LocalDate deadline, Priority priority,
                  String description) {
