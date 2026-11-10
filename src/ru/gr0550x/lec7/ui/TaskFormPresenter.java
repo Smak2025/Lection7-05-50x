@@ -27,8 +27,12 @@ public class TaskFormPresenter {
     public boolean saveClicked() {
         try {
             LocalDate deadline = parseDeadline(view.getDeadlineText());
-            Task task = new Task(view.getTaskTitle(), deadline, view.getPriority());
-            if (view.isArchived()) task.archive();
+            Task task = Task.builder(
+                            view.getTaskTitle(),
+                            deadline,
+                            view.getPriority())
+                    .archived(view.isArchived())
+                    .build();
             history.execute(new CreateTaskCommand(service, task));
             view.clearForm();
             return true;
