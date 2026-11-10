@@ -17,4 +17,7 @@ public interface TaskView {
     void showTasks(List<Task> tasks);
     void showStatistics(String text);
     void showError(String message);
+
+    // Показать подготовленный отчёт.
+    void showReport(String report);
 }

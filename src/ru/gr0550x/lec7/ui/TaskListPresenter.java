@@ -11,14 +11,22 @@ public class TaskListPresenter implements TaskChangeListener {
     private final TaskService service;
     private final CommandHistory history;
 
+    // Генераторы передаются презентеру при создании.
+    private final TaskReportGenerator shortReport;
+    private final TaskReportGenerator detailedReport;
+
     public TaskListPresenter(
             TaskView view,
             TaskService service,
-            CommandHistory history
+            CommandHistory history,
+            TaskReportGenerator shortReport,
+            TaskReportGenerator detailedReport
     ) {
         this.view = view;
         this.service = service;
         this.history = history;
+        this.shortReport = shortReport;
+        this.detailedReport = detailedReport;
     }
 
     public void start() {
@@ -66,5 +74,27 @@ public class TaskListPresenter implements TaskChangeListener {
 
     private String formatStatistics(TaskStatistics s) {
         return "Всего: " + s.total() + ", выполнено: " + s.done() + ", просрочено: " + s.overdue();
+    }
+
+    // Пользователь запросил краткий отчёт.
+    public void showShortReport() {
+        showReport(shortReport);
+    }
+
+    // Пользователь запросил подробный отчёт.
+    public void showDetailedReport() {
+        showReport(detailedReport);
+    }
+
+    // Общий сценарий получения и показа отчёта.
+    private void showReport(TaskReportGenerator generator) {
+        // Для отчёта получаем все задачи из сервиса.
+        List<Task> tasks = service.getAllTasks();
+
+        // Построение текста делегируем выбранному генератору.
+        String report = generator.generate(tasks);
+
+        // Готовый текст передаём представлению.
+        view.showReport(report);
     }
 }
