@@ -32,6 +32,7 @@ public class TaskFormPresenter {
                             deadline,
                             view.getPriority())
                     .archived(view.isArchived())
+                    .description("Описание задачи")
                     .build();
             history.execute(new CreateTaskCommand(service, task));
             view.clearForm();
