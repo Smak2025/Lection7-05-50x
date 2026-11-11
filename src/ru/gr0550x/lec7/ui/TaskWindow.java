@@ -1,6 +1,7 @@
 package ru.gr0550x.lec7.ui;
 
 import ru.gr0550x.lec7.application.CommandHistory;
+import ru.gr0550x.lec7.application.TaskReportGenerator;
 import ru.gr0550x.lec7.application.TaskService;
 import ru.gr0550x.lec7.domain.Priority;
 import ru.gr0550x.lec7.domain.Task;
@@ -23,16 +24,19 @@ public class TaskWindow extends JFrame implements TaskView {
     private final JButton saveButton = new JButton("Добавить");
     private final JButton completeButton = new JButton("Выполнить");
     private final JButton undoButton = new JButton("Отменить");
+    private final JButton shortReportButton = new JButton("Краткий отчёт");
+    private final JButton detailedReportButton = new JButton("Подробный отчёт");
     private final DefaultListModel<Task> listModel = new DefaultListModel<>();
     private final JList<Task> taskList = new JList<>(listModel);
     private final JLabel statisticsLabel = new JLabel(" ");
 
     public TaskWindow(
             TaskService service,
-            CommandHistory history
+            CommandHistory history,
+            List<TaskReportGenerator> reports
     ) {
         this.formPresenter = new TaskFormPresenter(this, service, history);
-        this.listPresenter = new TaskListPresenter(this, service, history);
+        this.listPresenter = new TaskListPresenter(this, service, history, reports);
 
         setTitle("Список задач");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -53,14 +57,22 @@ public class TaskWindow extends JFrame implements TaskView {
         form.add(new JLabel("Архивная:"));
         form.add(archivedBox);
 
-        JPanel buttons = new JPanel(new FlowLayout());
-        buttons.add(saveButton);
-        buttons.add(completeButton);
-        buttons.add(undoButton);
+        JPanel taskButtons = new JPanel(new FlowLayout());
+        taskButtons.add(saveButton);
+        taskButtons.add(completeButton);
+        taskButtons.add(undoButton);
+
+        JPanel reportButtons = new JPanel(new FlowLayout());
+        reportButtons.add(shortReportButton);
+        reportButtons.add(detailedReportButton);
+
+        JPanel controls = new JPanel(new GridLayout(2, 1));
+        controls.add(taskButtons);
+        controls.add(reportButtons);
 
         JPanel top = new JPanel(new BorderLayout(5, 5));
         top.add(form, BorderLayout.CENTER);
-        top.add(buttons, BorderLayout.SOUTH);
+        top.add(controls, BorderLayout.SOUTH);
 
         JPanel bottom = new JPanel(new BorderLayout(5, 5));
         bottom.add(filterBox, BorderLayout.NORTH);
@@ -97,6 +109,8 @@ public class TaskWindow extends JFrame implements TaskView {
         undoButton.addActionListener(e -> {
             listPresenter.undoLast();
         });
+        shortReportButton.addActionListener(e -> listPresenter.showShortReport());
+        detailedReportButton.addActionListener(e -> listPresenter.showDetailedReport());
     }
 
     private Color colorFor(Priority priority) {
@@ -135,5 +149,17 @@ public class TaskWindow extends JFrame implements TaskView {
     @Override
     public void showError(String message) {
         JOptionPane.showMessageDialog(this, message);
+    }
+
+    @Override
+    public void showReport(String report) {
+        JTextArea textArea = new JTextArea(report, 15, 45);
+        textArea.setEditable(false);
+        JOptionPane.showMessageDialog(
+                this,
+                new JScrollPane(textArea),
+                "Отчет о задачах",
+                JOptionPane.INFORMATION_MESSAGE
+        );
     }
 }

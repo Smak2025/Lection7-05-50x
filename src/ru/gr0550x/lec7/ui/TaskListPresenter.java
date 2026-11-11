@@ -10,15 +10,20 @@ public class TaskListPresenter implements TaskChangeListener {
     private final TaskView view;
     private final TaskService service;
     private final CommandHistory history;
+    private TaskReportGenerator shortReport = null;
+    private TaskReportGenerator detailedReport = null;
 
     public TaskListPresenter(
             TaskView view,
             TaskService service,
-            CommandHistory history
+            CommandHistory history,
+            List<TaskReportGenerator> reportGenerators
     ) {
         this.view = view;
         this.service = service;
         this.history = history;
+        if (reportGenerators.size() > 0) shortReport = reportGenerators.get(0);
+        if (reportGenerators.size() > 1) detailedReport = reportGenerators.get(1);
     }
 
     public void start() {
@@ -66,5 +71,19 @@ public class TaskListPresenter implements TaskChangeListener {
 
     private String formatStatistics(TaskStatistics s) {
         return "Всего: " + s.total() + ", выполнено: " + s.done() + ", просрочено: " + s.overdue();
+    }
+
+    public void showShortReport(){
+        showReport(shortReport);
+    }
+
+    public void showDetailedReport(){
+        showReport(detailedReport);
+    }
+
+    private void showReport(TaskReportGenerator generator){
+        var tasks = service.getAllTasks();
+        var report = generator.generate(tasks);
+        view.showReport(report);
     }
 }
